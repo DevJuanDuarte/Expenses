@@ -26,8 +26,8 @@ export class ExpensesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
-    return this.expensesService.update(+id, updateExpenseDto);
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
+    return this.expensesService.update(id, updateExpenseDto);
   }
 
   @Delete(':id')

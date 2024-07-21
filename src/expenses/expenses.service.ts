@@ -84,8 +84,25 @@ export class ExpensesService {
     return expense
   }
 
-  update(id: number, updateExpenseDto: UpdateExpenseDto) {
-    return `This action updates a #${id} expense`;
+  async update(id: string, updateExpenseDto: UpdateExpenseDto) {
+
+    const expense = await this.expenseRepository.preload({
+      id: id,
+      ...updateExpenseDto
+    });
+
+    if (!expense) {
+      throw new BadRequestException(`El gasto con el id ${id} no existe`);
+    }
+
+    try {
+      await this.expenseRepository.save(expense);
+      return expense;
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
+
+
   }
 
   //Recordar que se deja como asincrona

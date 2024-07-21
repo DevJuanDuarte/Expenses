@@ -1,10 +1,10 @@
-import { IsDateString, IsNumber, IsOptional, IsPositive, IsString, MinLength } from "class-validator";
+import { IsArray, IsDateString, IsNumber, IsOptional, IsPositive, IsString, MinLength } from "class-validator";
 
 export class CreateExpenseDto {
 
   @IsString()
   @MinLength(1)
-  title:string;
+  title: string;
 
   @IsNumber()
   @IsOptional()
@@ -17,9 +17,14 @@ export class CreateExpenseDto {
 
   @IsNumber()
   @IsPositive()
-  quantity?:number;
+  quantity?: number;
 
   @IsOptional()
   @IsDateString()
   created?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  tags: string[]
 }
