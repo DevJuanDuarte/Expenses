@@ -20,9 +20,9 @@ export class ExpensesController {
     return this.expensesService.findAll(paginationDto);
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.expensesService.findOne(id);
+  @Get(':term')
+  findOne(@Param('term') term: string) {
+    return this.expensesService.findOne(term);
   }
 
   @Patch(':id')

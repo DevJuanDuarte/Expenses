@@ -6,6 +6,10 @@ import { Expense } from './entities/expense.entity';
 import { Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/pagination.dto';
 
+//Se importa el validate de uuid agregandole un alias, para est se debe instalar lo siguiente:
+//npm i uuid - npm i @types/uuid
+import { validate as uuid } from "uuid";
+
 @Injectable()
 export class ExpensesService {
 
@@ -49,13 +53,32 @@ export class ExpensesService {
     });
   }
 
+  //Buscar por id, title o por description
   //Recordar que se deja como asincrona
-  async findOne(id: string) {
+  async findOne(term: string) {
+    // Se declara una variable del tipo de la entidad
+    let expense: Expense;
+
+    //Si el termino es un uuid
+    if (uuid(term)) {
+      //El gasto sera igual al id
+      expense = await this.expenseRepository.findOneBy({ id: term });
+    } else {
+      //Si no, se le aplica un QueryBuilder para buscar por varios parametros:
+      //Se declara una constante se que sea igual al createQueryBuilder que trae el repositorio.
+      const queryBuilder = this.expenseRepository.createQueryBuilder();
+      //Entonces el gasto seria ugual al await de la constante.where('Aqui se aplica la consulta sql', {Aqui se aplica los parametros de la consulta})
+      expense = await queryBuilder
+      .where('UPPER(title) =:title OR LOWER(description) =:description',
+        { title: term.toUpperCase(), description:term.toLowerCase()}).getOne();//getOne(): Que solo busque uno de los dos
+    }
+
     // Esta linea busca un solo registro por id
-    const expense = await this.expenseRepository.findOneBy({ id });
+    // const expense = await this.expenseRepository.findOneBy({ id });
+
     //Si el id no existe devuelve un mensaje de erro
     if (!expense) {
-      throw new NotFoundException(`El gasto con el id ${id} no existe`);
+      throw new NotFoundException(`El gasto ${term} no existe`);
     }
     //Si el id existe devuelve el registro
     return expense
